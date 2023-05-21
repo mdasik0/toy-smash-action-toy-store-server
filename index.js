@@ -117,10 +117,15 @@ async function run() {
     app.get("/myToys/:id", async (req, res) => {
       let query = {};
       const id = req.params.id;
+
       if (id) {
+
         query = { email: id };
+
       }
+
       console.log(id);
+      
       const result = await allToysCollection.find(query).toArray();
       res.send(result);
     });
