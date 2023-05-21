@@ -32,6 +32,7 @@ async function run() {
     //-----------------------------------
     //         SubCategory
     //-----------------------------------
+
     // get all subcategory data
     app.get("/subCategory", async (req, res) => {
       const cursor = subCategoryCollection.find();
@@ -48,6 +49,7 @@ async function run() {
     //-----------------------------------
     //            All Toys
     //-----------------------------------
+
     // for sorting by price
     app.get("/allToys", async (req, res) => {
       const sortBy = req.query.sortBy; 
@@ -75,9 +77,11 @@ async function run() {
       const result = await allToysCollection.find(query).toArray();
       res.send(result);
     });
+
     //-----------------------------------
     //            My Toys
     //-----------------------------------
+
     // get all data
     app.get("/singleData", async (req, res) => {
       const cursor = allToysCollection.find();
