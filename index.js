@@ -26,8 +26,8 @@ async function run() {
     // await client.connect();
 
     const subCategoryCollection = client
-    .db("toyStore")
-    .collection("subCategory");
+      .db("toyStore")
+      .collection("subCategory");
     const allToysCollection = client.db("toyStore").collection("allToys");
     //-----------------------------------
     //         SubCategory
@@ -39,8 +39,18 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-    // find data by id 
-    app.get("/subCategory/:id", async (req, res) => {
+    
+    // find datas by category
+    app.get("/subCategory/:category", async (req, res) => {
+      const category = req.params.category;
+      const result = await subCategoryCollection
+        .find({ subCategory: category })
+        .toArray();
+      res.send(result);
+    });
+
+    // find data by id
+    app.get("/Category/:id", async (req, res) => {
       const id = req.params.id;
       const querry = { _id: new ObjectId(id) };
       const result = await subCategoryCollection.findOne(querry);
@@ -52,10 +62,16 @@ async function run() {
 
     // for sorting by price
     app.get("/allToys", async (req, res) => {
-      const sortBy = req.query.sortBy; 
-      const cursor = allToysCollection.find().sort({ [sortBy]: 1 });
-      const result = await cursor.toArray();
-      res.send(result);
+      const sortBy = req.query.sortBy;
+      if (sortBy === "dsc") {
+        const cursor = allToysCollection.find().sort({ price: -1 });
+        const result = await cursor.toArray();
+        res.send(result);
+      } else if (sortBy === "asc") {
+        const cursor = allToysCollection.find().sort({ price: 1 });
+        const result = await cursor.toArray();
+        res.send(result);
+      }
     });
 
     // add a toy
@@ -65,7 +81,7 @@ async function run() {
       res.send(result);
       // console.log(toy)
     });
-    
+
     // for searching data
     app.get("/allToys/:name", async (req, res) => {
       let query = {};
@@ -73,7 +89,7 @@ async function run() {
       if (name) {
         query = { name: name };
       }
-      console.log(name);
+      // console.log(name);
       const result = await allToysCollection.find(query).toArray();
       res.send(result);
     });
@@ -97,22 +113,26 @@ async function run() {
     });
 
     // for updating data
-    app.put("/singleData/:id", async(req,res) => {
+    app.put("/singleData/:id", async (req, res) => {
       const id = req.params.id;
       const data = req.body;
-      console.log(data)
-      const filter = {_id : new ObjectId(id)};
-      const options = {upsert : true}
+      // console.log(data);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
       const updatedToy = {
-        $set : {
+        $set: {
           quantity: data.quantity,
           price: data.price,
-          description: data.description
-        }
-      }
-      const result = await allToysCollection.updateOne(filter,updatedToy,options)
-      res.send(result)
-    })
+          description: data.description,
+        },
+      };
+      const result = await allToysCollection.updateOne(
+        filter,
+        updatedToy,
+        options
+      );
+      res.send(result);
+    });
     // data fetch by email address
     app.get("/myToys/:id", async (req, res) => {
       let query = {};
@@ -121,14 +141,22 @@ async function run() {
       if (id) {
         query = { email: id };
       }
-      console.log(id);
+      // console.log(id);
       const result = await allToysCollection.find(query).toArray();
       res.send(result);
     });
-    
-
-    
-
+    app.get("/sortOne/:id", async (req, res) => {
+      const id = req.params.id;
+        const cursor = allToysCollection.find({ email: id }).sort({ price: -1 });
+        const result = await cursor.toArray();
+        res.send(result);
+    });
+    app.get("/sortTwo/:id", async (req, res) => {
+      const id = req.params.id;
+        const cursor = allToysCollection.find({ email: id }).sort({ price: 1 });
+        const result = await cursor.toArray();
+        res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
