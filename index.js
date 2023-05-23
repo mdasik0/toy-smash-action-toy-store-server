@@ -145,6 +145,7 @@ async function run() {
       const result = await allToysCollection.find(query).toArray();
       res.send(result);
     });
+    // sort by decending and ascending in my toys 
     app.get("/sortOne/:id", async (req, res) => {
       const id = req.params.id;
         const cursor = allToysCollection.find({ email: id }).sort({ price: -1 });
